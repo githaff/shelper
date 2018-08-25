@@ -1,0 +1,48 @@
+# -*- mode: shell-script -*-
+#
+# Helper environment for writing shell scripts
+#
+
+#### Program parameters ########################################################
+
+UTIL_NAME=$(basename $0)
+UTIL_DIR=$(dirname `readlink -f $0`)
+
+
+#### Print functions ###########################################################
+
+info() {
+    echo $@
+}
+out() {
+    echo -en $@
+}
+outn() {
+    out $@
+    echo
+}
+err () {
+    echo "Error: $@" >& 2
+}
+warn () {
+    echo "Warning: $@" >& 2
+}
+
+
+#### Usage generation ##########################################################
+
+usage_list() {
+    local list_raw=$(declare -p "$1")
+    eval "declare -A list="${list_raw#*=}
+
+    local max_key_length=0
+    for key in "${!list[@]}"; do
+        [ "${#key}" -gt "$max_key_length" ] && max_key_length="${#key}"
+    done
+
+    local padding=$((max_key_length + 8))
+    for key in "${!list[@]}"; do
+        printf "  %-${padding}s" "$key"
+        echo ${list[$key]}
+    done
+}
